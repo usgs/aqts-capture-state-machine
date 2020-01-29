@@ -1,0 +1,35 @@
+service: aqts-capture-state-machine
+
+provider:
+  name: aws
+  region: us-west-2
+  deploymentBucket:
+    name: iow-cloud-applications
+  stackTags:
+    "wma:applicationId": "Aquarius TS Capture State Machine"
+    "wma:contact": "Andrew Yan ayan@usgs.gov"
+    "wma:environment": test
+    taggingVersion: 0.0.1
+    "wma:costCenter": TBD
+
+custom:
+  accountNumber: ${ssm:/iow/aws/accountNumber}
+  deployStage: ${opt:stage, test}
+
+stepFunctions:
+  stateMachines:
+    aqtsCaptureStateMachine:
+      role: arn:aws:iam::${self:custom.accountNumber}:role/step-functions-service-access
+      name: aqts-capture-state-machine-${self:custom.deployStage}
+      definition:
+        Comment: "State machine representing extract, transformation, and load from Aquarius"
+        StartAt: defaultSuccess
+        States:
+          defaultFail:
+            Type: Fail
+            Cause: "This is the default failure state."
+          defaultSuccess:
+            Type: Succeed
+
+plugins:
+  - serverless-step-functions
