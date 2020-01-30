@@ -25,9 +25,6 @@ stepFunctions:
         Comment: "State machine representing extract, transformation, and load from Aquarius"
         StartAt: defaultSuccess
         States:
-          defaultFail:
-            Type: Fail
-            Cause: "This is the default failure state."
           defaultSuccess:
             Type: Succeed
 
