@@ -9,6 +9,9 @@ pipeline {
     parameters {
         choice(choices: ['test', 'qa', 'prod-external'], description: 'Deploy Stage (i.e. tier)', name: 'DEPLOY_STAGE')
     }
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
     stages {
         stage('run build the zip file for lambda') {
             agent {
