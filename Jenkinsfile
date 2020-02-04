@@ -7,7 +7,7 @@ pipeline {
         }
     }
     parameters {
-        choice(choices: ['test', 'qa', 'prod-external'], description: 'Deploy Stage (i.e. tier)', name: 'DEPLOY_STAGE')
+        choice(choices: ['TEST', 'QA', 'PROD-EXTERNAL'], description: 'Deploy Stage (i.e. tier)', name: 'DEPLOY_STAGE')
     }
     triggers {
         pollSCM('H/5 * * * *')
@@ -21,7 +21,7 @@ pipeline {
                 sh '''
                 npm install serverless
                 ./node_modules/serverless/bin/serverless plugin install -n serverless-step-functions
-                ./node_modules/serverless/bin/serverless deploy --stage ${DEPLOY_STAGE}
+                ./node_modules/serverless/bin/serverless deploy --stage ${DEPLOY_STAGE} --region us-west-2
                 '''
             }
         }
