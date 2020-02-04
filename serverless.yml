@@ -27,7 +27,7 @@ stepFunctions:
         States:
           captureInitialLoad:
             Type: Task
-            Resource: arn:aws:lambda:us-west-2:${self:custom.accountNumber}:function:aqts-retriever-capture-raw-load-${self:provider.stage}-iowRetrieverCapture
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-retriever-capture-raw-load-${self:provider.stage}-iowRetrieverCapture
             TimeoutSeconds: 60
             Retry:
               - ErrorEquals:
