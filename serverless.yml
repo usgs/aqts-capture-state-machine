@@ -32,9 +32,9 @@ stepFunctions:
             Retry:
               - ErrorEquals:
                 - States.TaskFailed
-              IntervalSeconds: 3
-              MaxAttempts: 3
-              BackoffRate: 2
+                IntervalSeconds: 3
+                MaxAttempts: 3
+                BackoffRate: 2
             Next: defaultSuccess
           defaultSuccess:
             Type: Succeed
