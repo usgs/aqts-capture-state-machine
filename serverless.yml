@@ -51,10 +51,13 @@ stepFunctions:
             Type: Choice
             Choices:
               - Variable: "$.type"
-                StringEquals: tsDescription
-                Next: tsDescription
+                StringEquals: tsDescriptionList
+                Next: tsDescriptionList
+              - Variable: "$.type"
+                StringEquals: tsCorrectedData
+                Next: tsCorrectedData
             Default: defaultSuccess
-          tsTypeRouterTask:
+          tsDescriptionList:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-description-${self:provider.stage}-echoObject
             TimeoutSeconds: 60
@@ -64,6 +67,9 @@ stepFunctions:
                 IntervalSeconds: 3
                 MaxAttempts: 3
                 BackoffRate: 2
+            Next: defaultSuccess
+          tsCorrectedData:
+            Type: Pass
             Next: defaultSuccess
           defaultSuccess:
             Type: Succeed
