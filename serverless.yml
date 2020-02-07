@@ -51,7 +51,7 @@ stepFunctions:
             Type: Choice
             Choices:
               - Variable: "$.type"
-                StringEquals: tsDescriptionListx
+                StringEquals: tsDescriptionList
                 Next: tsDescriptionList
               - Variable: "$.type"
                 StringEquals: tsCorrectedData
