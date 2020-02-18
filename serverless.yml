@@ -12,6 +12,7 @@ provider:
     "wma:environment": ${self:provider.stage}
     "wma:taggingVersion": 0.0.1
     "wma:costCenter": TBD
+    "commitIdentifier": "${git:sha1}"
 
 custom:
   accountNumber: ${ssm:/iow/aws/accountNumber}
@@ -76,3 +77,4 @@ stepFunctions:
 
 plugins:
   - serverless-step-functions
+  - serverless-plugin-git-variables
