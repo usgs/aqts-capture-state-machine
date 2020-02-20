@@ -33,7 +33,7 @@ stepFunctions:
             Retry:
               - ErrorEquals:
                 - States.TaskFailed
-                IntervalSeconds: 3
+                IntervalSeconds: 10
                 MaxAttempts: 3
                 BackoffRate: 2
             Next: tsTypeRouterTask
@@ -52,7 +52,7 @@ stepFunctions:
             Type: Choice
             Choices:
               - Variable: "$.type"
-                StringEquals: tsDescriptionListx
+                StringEquals: tsDescriptionList
                 Next: tsDescriptionList
               - Variable: "$.type"
                 StringEquals: tsCorrectedData
@@ -70,7 +70,15 @@ stepFunctions:
                 BackoffRate: 2
             Next: defaultSuccess
           tsCorrectedData:
-            Type: Pass
+            Type: Task
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-corrected-${self:provider.stage}-preProcess
+            TimeoutSeconds: 60
+            Retry:
+              - ErrorEquals:
+                - States.TaskFailed
+                IntervalSeconds: 3
+                MaxAttempts: 3
+                BackoffRate: 2
             Next: defaultSuccess
           defaultSuccess:
             Type: Succeed
