@@ -36,6 +36,11 @@ stepFunctions:
                 IntervalSeconds: 10
                 MaxAttempts: 3
                 BackoffRate: 2
+            Catch:
+              - ErrorEquals:
+                - States.ALL
+                ResultPath: "$.error-info"
+                Next: errorHandler
             Next: tsTypeRouterTask
           tsTypeRouterTask:
             Type: Task
@@ -47,6 +52,11 @@ stepFunctions:
                 IntervalSeconds: 3
                 MaxAttempts: 3
                 BackoffRate: 2
+            Catch:
+              - ErrorEquals:
+                - States.ALL
+                ResultPath: "$.error-info"
+                Next: errorHandler
             Next: tsTypeRouterChoice
           tsTypeRouterChoice:
             Type: Choice
@@ -69,6 +79,11 @@ stepFunctions:
                 IntervalSeconds: 3
                 MaxAttempts: 3
                 BackoffRate: 2
+            Catch:
+              - ErrorEquals:
+                - States.ALL
+                ResultPath: "$.error-info"
+                Next: errorHandler
             Next: defaultSuccess
           tsCorrectedData:
             Type: Task
@@ -81,9 +96,21 @@ stepFunctions:
                 IntervalSeconds: 3
                 MaxAttempts: 3
                 BackoffRate: 2
+            Catch:
+              - ErrorEquals:
+                - States.ALL
+                ResultPath: "$.error-info"
+                Next: errorHandler
             Next: defaultSuccess
+          errorHandler:
+            Type: Task
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-error-handler-${self:provider.stage}-aqtsErrorHandler
+            TimeoutSeconds: 15
+            Next: defaultFail
           defaultSuccess:
             Type: Succeed
+          defaultFail:
+            Type: Fail
 
 plugins:
   - serverless-step-functions
