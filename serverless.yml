@@ -70,7 +70,7 @@ stepFunctions:
             Default: defaultSuccess
           tsDescriptionList:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-description-${self:provider.stage}-processTimeSeriesDescription
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-description-${self:provider.stage}-processTsDescription
             ResultPath: $.timeSeries
             TimeoutSeconds: 60
             Retry:
