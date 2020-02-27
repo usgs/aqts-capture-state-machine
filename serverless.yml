@@ -84,7 +84,7 @@ stepFunctions:
                 - States.ALL
                 ResultPath: "$.error-info"
                 Next: errorHandler
-            Next: defaultSuccess
+            Next: tsTransformMapper
           tsCorrectedData:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-corrected-${self:provider.stage}-preProcess
@@ -101,7 +101,33 @@ stepFunctions:
                 - States.ALL
                 ResultPath: "$.error-info"
                 Next: errorHandler
+            Next: tsTransformMapper
+          tsTransformMapper:
+            Type: Map
             Next: defaultSuccess
+            ItemsPath: $.timeSeries
+            MaxConcurrency: 0
+            Iterator:
+              StartAt: tsDataTypeIdentifier
+              States:
+                tsDataTypeIdentifier:
+                  Type: Pass
+                  Next: tsDataTypeRouter
+                tsDataTypeRouter:
+                  Type: Choice
+                  Choices:
+                    - Variable: $.dataType
+                      StringEquals: tsDailyValueStatisticalTransform
+                      Next: tsDailyValueStatisticalTransform
+                  Default: defaultMapSuccess
+                tsDailyValueStatisticalTransform:
+                  Type: Pass
+                  Next: loadToObservationDb
+                loadToObservationDb:
+                  Type: Pass
+                  End: true
+                defaultMapSuccess:
+                  Type: Succeed
           errorHandler:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-error-handler-${self:provider.stage}-aqtsErrorHandler
