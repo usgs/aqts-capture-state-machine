@@ -48,7 +48,7 @@ stepFunctions:
           captureInitialLoad:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-retriever-capture-raw-load-${self:provider.stage}-iowRetrieverCapture
-            TimeoutSeconds: 120
+            TimeoutSeconds: 180
             Retry:
               - ErrorEquals:
                 - States.TaskFailed
