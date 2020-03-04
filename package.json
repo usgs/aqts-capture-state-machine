@@ -2,8 +2,8 @@
   "name": "Aquarius TS Capture State Machine",
   "description": "Deployment via serverless",
   "dependencies": {
-    "serverless": "^1.61.1",
-    "serverless-step-functions": "^2.17.0",
-    "serverless-plugin-git-variables": "^3.4.0"
+    "serverless": "^1.65.0",
+    "serverless-step-functions": "^2.17.2",
+    "serverless-plugin-git-variables": "^4.0.0"
   }
 }
