@@ -1,5 +1,5 @@
 {
-  "name": "Aquarius TS Capture State Machine",
+  "name": "aqarius-ts-capture-state-machine",
   "description": "Deployment via serverless",
   "dependencies": {
     "serverless": "^1.65.0",
