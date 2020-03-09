@@ -130,7 +130,19 @@ stepFunctions:
               StartAt: tsDataTypeIdentifier
               States:
                 tsDataTypeIdentifier:
-                  Type: Pass
+                  Type: Task
+                  Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-stattype-router-${self:provider.stage}-determineRoute
+                  TimeoutSeconds: 60
+                  Retry:
+                    - ErrorEquals:
+                      - States.TaskFailed
+                      IntervalSeconds: 3
+                      MaxAttempts: 3
+                      BackoffRate: 2
+                  Catch:
+                    - ErrorEquals:
+                      - States.ALL
+                      Next: errorHandler
                   Next: tsDataTypeRouter
                 tsDataTypeRouter:
                   Type: Choice
@@ -140,7 +152,19 @@ stepFunctions:
                       Next: tsDailyValueStatisticalTransform
                   Default: defaultMapSuccess
                 tsDailyValueStatisticalTransform:
-                  Type: Pass
+                  Type: Task
+                  Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-dvstat-transform-${self:provider.stage}-transform
+                  TimeoutSeconds: 60
+                  Retry:
+                    - ErrorEquals:
+                      - States.TaskFailed
+                      IntervalSeconds: 3
+                      MaxAttempts: 3
+                      BackoffRate: 2
+                  Catch:
+                    - ErrorEquals:
+                      - States.ALL
+                      Next: errorHandler
                   Next: loadToObservationDb
                 loadToObservationDb:
                   Type: Pass
