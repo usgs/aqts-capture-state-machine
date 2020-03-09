@@ -127,7 +127,7 @@ stepFunctions:
             ItemsPath: $.timeSeries.timeSeriesList
             ResultPath: $.timeSeries
             Parameters:
-              timesSeries.$: $$.Map.Item.Value
+              uniqueId.$: $$.Map.Item.Value.uniqueId
               id.$: $.id
               type.$: $.type
             MaxConcurrency: 0
