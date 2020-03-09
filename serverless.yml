@@ -142,7 +142,7 @@ stepFunctions:
                   Catch:
                     - ErrorEquals:
                       - States.ALL
-                      Next: errorHandler
+                      Next: defaultMapFail
                   Next: tsDataTypeRouter
                 tsDataTypeRouter:
                   Type: Choice
@@ -164,13 +164,15 @@ stepFunctions:
                   Catch:
                     - ErrorEquals:
                       - States.ALL
-                      Next: errorHandler
+                      Next: defaultMapFail
                   Next: loadToObservationDb
                 loadToObservationDb:
                   Type: Pass
                   End: true
                 defaultMapSuccess:
                   Type: Succeed
+                defaultMapFail:
+                  Type: Fail
           errorHandler:
             Type: Task
             Parameters:
