@@ -137,6 +137,7 @@ stepFunctions:
                 tsDataTypeIdentifier:
                   Type: Task
                   Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-stattype-router-${self:provider.stage}-determineRoute
+                  ResultPath: $.out
                   TimeoutSeconds: 60
                   Retry:
                     - ErrorEquals:
@@ -152,13 +153,18 @@ stepFunctions:
                 tsDataTypeRouter:
                   Type: Choice
                   Choices:
-                    - Variable: $.dataType
+                    - Variable: $.out.dataType
                       StringEquals: tsDailyValueStatisticalTransform
                       Next: tsDailyValueStatisticalTransform
                   Default: defaultMapSuccess
                 tsDailyValueStatisticalTransform:
                   Type: Task
                   Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-dvstat-transform-${self:provider.stage}-transform
+                  Parameters:
+                    uniqueId.$: $$.Map.Item.Value.uniqueId
+                    id.$: $.id
+                    type.$: $.type
+                    dataType.$: $.out.dataType
                   TimeoutSeconds: 60
                   Retry:
                     - ErrorEquals:
