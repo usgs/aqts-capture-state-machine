@@ -124,7 +124,7 @@ stepFunctions:
                 - States.ALL
                 Next: errorHandler
             Next: defaultSuccess
-            ItemsPath: $.timeSeries
+            ItemsPath: $.timeSeries.timeSeriesList
             MaxConcurrency: 0
             Iterator:
               StartAt: tsDataTypeIdentifier
