@@ -125,6 +125,11 @@ stepFunctions:
                 Next: errorHandler
             Next: defaultSuccess
             ItemsPath: $.timeSeries.timeSeriesList
+            ResultPath: $.timeSeries
+            Parameters:
+              - timesSeries.$: $$.Map.Item.Value
+              - id.$: $.id
+              - type.$: $.type
             MaxConcurrency: 0
             Iterator:
               StartAt: tsDataTypeIdentifier
