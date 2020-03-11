@@ -52,8 +52,8 @@ stepFunctions:
             Retry:
               - ErrorEquals:
                 - States.TaskFailed
-                IntervalSeconds: 10
-                MaxAttempts: 3
+                IntervalSeconds: 35
+                MaxAttempts: 2
                 BackoffRate: 2
             Catch:
               - ErrorEquals:
@@ -67,8 +67,8 @@ stepFunctions:
             Retry:
               - ErrorEquals:
                 - States.TaskFailed
-                IntervalSeconds: 3
-                MaxAttempts: 3
+                IntervalSeconds: 35
+                MaxAttempts: 2
                 BackoffRate: 2
             Catch:
               - ErrorEquals:
@@ -93,8 +93,8 @@ stepFunctions:
             Retry:
               - ErrorEquals:
                 - States.TaskFailed
-                IntervalSeconds: 3
-                MaxAttempts: 3
+                IntervalSeconds: 35
+                MaxAttempts: 2
                 BackoffRate: 2
             Catch:
               - ErrorEquals:
@@ -109,8 +109,8 @@ stepFunctions:
             Retry:
               - ErrorEquals:
                 - States.TaskFailed
-                IntervalSeconds: 3
-                MaxAttempts: 3
+                IntervalSeconds: 35
+                MaxAttempts: 2
                 BackoffRate: 2
             Catch:
               - ErrorEquals:
@@ -142,8 +142,8 @@ stepFunctions:
                   Retry:
                     - ErrorEquals:
                       - States.TaskFailed
-                      IntervalSeconds: 3
-                      MaxAttempts: 3
+                      IntervalSeconds: 35
+                      MaxAttempts: 2
                       BackoffRate: 2
                   Catch:
                     - ErrorEquals:
@@ -169,8 +169,8 @@ stepFunctions:
                   Retry:
                     - ErrorEquals:
                       - States.TaskFailed
-                      IntervalSeconds: 3
-                      MaxAttempts: 3
+                      IntervalSeconds: 35
+                      MaxAttempts: 2
                       BackoffRate: 2
                   Catch:
                     - ErrorEquals:
