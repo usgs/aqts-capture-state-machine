@@ -192,7 +192,6 @@ stepFunctions:
                   Catch:
                     - ErrorEquals:
                       - States.ALL
-                      Next: errorHandler
                 defaultMapSuccess:
                   Type: Succeed
                 defaultMapFail:
