@@ -184,6 +184,21 @@ stepFunctions:
                   Type: Succeed
                 defaultMapFail:
                   Type: Fail
+          tsLoader:
+            Type: Task
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-loader-${self:provider.stage}-loadTimeSeries
+            ResultPath: $.timeSeries
+            TimeoutSeconds: 60
+            Retry:
+              - ErrorEquals:
+                - States.TaskFailed
+                IntervalSeconds: 35
+                MaxAttempts: 2
+                BackoffRate: 2
+            Catch:
+              - ErrorEquals:
+                - States.ALL
+                Next: errorHandler
           errorHandler:
             Type: Task
             Parameters:
