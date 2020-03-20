@@ -20,6 +20,14 @@ custom:
 stepFunctions:
   stateMachines:
     aqtsCaptureStateMachine:
+      alarms:
+        topics:
+          alarm:
+            Ref: snsTopic
+        metrics:
+          - executionsFailed
+          - executionThrottled
+        treatMissingData: missing
       role: arn:aws:iam::${self:custom.accountNumber}:role/step-functions-service-access
       name: aqts-capture-state-machine-${self:provider.stage}
       definition:
@@ -210,6 +218,33 @@ stepFunctions:
             Type: Succeed
           defaultFail:
             Type: Fail
+
+resources:
+  Resources:
+    snsTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: ${self:service}-${self:provider.stage}-topic
+        TopicName: ${self:service}-${self:provider.stage}-topic
+    stateDurationAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmName: ${self:service}-${self:provider.stage}-duration-alarm
+        AlarmDescription: Notify when duration exceeds a threshold
+        Namespace: 'AWS/States'
+        Dimensions:
+          - Name: StateMachineArn
+            Value:
+              Ref: AqtsDashcaptureDashstateDashmachineDash${self:provider.stage}
+        MetricName: ExecutionTime
+        Statistic: Maximum
+        ComparisonOperator: GreaterThanOrEqualToThreshold
+        Period: 60
+        EvaluationPeriods: 1
+        Threshold: 295000  # just under 5 minutes
+        TreatMissingData: missing
+        AlarmActions:
+          - Ref: snsTopic
 
 plugins:
   - serverless-step-functions
