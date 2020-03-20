@@ -173,6 +173,7 @@ stepFunctions:
                     id.$: $.id
                     type.$: $.type
                     dataType.$: $.out.dataType
+                  ResultPath: $.transformResult
                   TimeoutSeconds: 60
                   Retry:
                     - ErrorEquals:
