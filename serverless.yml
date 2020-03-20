@@ -173,6 +173,7 @@ stepFunctions:
                     id.$: $.id
                     type.$: $.type
                     dataType.$: $.out.dataType
+                  ResultPath: $.transformResult
                   TimeoutSeconds: 60
                   Retry:
                     - ErrorEquals:
@@ -190,7 +191,7 @@ stepFunctions:
                   Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-loader-${self:provider.stage}-loadTimeSeries
                   Parameters:
                     uniqueId.$: $.uniqueId
-                  ResultPath: $.timeSeries
+                  ResultPath: $.loadTimeSeries
                   TimeoutSeconds: 60
                   End: true
                   Retry:
