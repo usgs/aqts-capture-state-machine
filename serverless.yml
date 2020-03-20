@@ -180,6 +180,8 @@ stepFunctions:
                 loadToObservationDb:
                   Type: Task
                   Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-loader-${self:provider.stage}-loadTimeSeries
+                  Parameters:
+                    uniqueId.$: $.uniqueId
                   ResultPath: $.timeSeries
                   TimeoutSeconds: 60
                   End: true
