@@ -113,7 +113,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-corrected-${self:provider.stage}-preProcess
             ResultPath: $.timeSeries
-            TimeoutSeconds: 60
+            TimeoutSeconds: 90
             Retry:
               - ErrorEquals:
                 - States.TaskFailed
