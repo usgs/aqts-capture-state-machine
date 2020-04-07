@@ -240,7 +240,7 @@ resources:
         Dimensions:
           - Name: StateMachineArn
             Value:
-              Ref: AqtsDashcaptureDashstateDashmachineDash${self:custom.tier.{self:provider.stage}}
+              Ref: AqtsDashcaptureDashstateDashmachineDash${self:custom.tier.${self:provider.stage}}
         MetricName: ExecutionTime
         Statistic: Maximum
         ComparisonOperator: GreaterThanOrEqualToThreshold
