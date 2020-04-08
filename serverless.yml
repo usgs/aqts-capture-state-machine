@@ -216,8 +216,9 @@ stepFunctions:
             Type: Task
             Parameters:
               "executionArn.$": "$$.Execution.Id"
+              "startInput.$": "$$.Execution.Input"
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-error-handler-${self:provider.stage}-aqtsErrorHandler
-            TimeoutSeconds: 15
+            TimeoutSeconds: 60
             Next: defaultFail
           defaultSuccess:
             Type: Succeed
