@@ -64,7 +64,7 @@ stepFunctions:
             Retry:
               - ErrorEquals:
                 - States.TaskFailed
-                IntervalSeconds: 70
+                IntervalSeconds: 85
                 MaxAttempts: 1
                 BackoffRate: 2
             Catch:
@@ -75,7 +75,7 @@ stepFunctions:
           tsTypeRouterTask:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-ts-type-router-${self:provider.stage}-determineRoute
-            TimeoutSeconds: 60
+            TimeoutSeconds: 75
             Retry:
               - ErrorEquals:
                 - States.TaskFailed
@@ -101,7 +101,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-description-${self:provider.stage}-processTsDescription
             ResultPath: $.timeSeries
-            TimeoutSeconds: 60
+            TimeoutSeconds: 75
             Retry:
               - ErrorEquals:
                 - States.TaskFailed
@@ -117,7 +117,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-corrected-${self:provider.stage}-preProcess
             ResultPath: $.timeSeries
-            TimeoutSeconds: 90
+            TimeoutSeconds: 105
             Retry:
               - ErrorEquals:
                 - States.TaskFailed
@@ -150,7 +150,7 @@ stepFunctions:
                   Type: Task
                   Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-stattype-router-${self:provider.stage}-determineRoute
                   ResultPath: $.out
-                  TimeoutSeconds: 60
+                  TimeoutSeconds: 75
                   Retry:
                     - ErrorEquals:
                       - States.TaskFailed
@@ -178,7 +178,7 @@ stepFunctions:
                     type.$: $.type
                     dataType.$: $.out.dataType
                   ResultPath: $.transformResult
-                  TimeoutSeconds: 60
+                  TimeoutSeconds: 75
                   Retry:
                     - ErrorEquals:
                       - States.TaskFailed
@@ -196,7 +196,7 @@ stepFunctions:
                   Parameters:
                     uniqueId.$: $.uniqueId
                   ResultPath: $.loadTimeSeries
-                  TimeoutSeconds: 60
+                  TimeoutSeconds: 75
                   End: true
                   Retry:
                     - ErrorEquals:
