@@ -142,7 +142,7 @@ stepFunctions:
               uniqueId.$: $$.Map.Item.Value.uniqueId
               id.$: $.id
               type.$: $.type
-            MaxConcurrency: 0
+            MaxConcurrency: 5
             Iterator:
               StartAt: tsDataTypeIdentifier
               States:
