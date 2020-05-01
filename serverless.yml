@@ -61,12 +61,6 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-raw-load-${self:provider.stage}-iowCapture
             TimeoutSeconds: 120
-            Retry:
-              - ErrorEquals:
-                - States.TaskFailed
-                IntervalSeconds: 85
-                MaxAttempts: 1
-                BackoffRate: 2
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -76,12 +70,6 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-ts-type-router-${self:provider.stage}-determineRoute
             TimeoutSeconds: 75
-            Retry:
-              - ErrorEquals:
-                - States.TaskFailed
-                IntervalSeconds: 70
-                MaxAttempts: 1
-                BackoffRate: 2
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -102,12 +90,6 @@ stepFunctions:
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-description-${self:provider.stage}-processTsDescription
             ResultPath: $.timeSeries
             TimeoutSeconds: 75
-            Retry:
-              - ErrorEquals:
-                - States.TaskFailed
-                IntervalSeconds: 70
-                MaxAttempts: 1
-                BackoffRate: 2
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -118,12 +100,6 @@ stepFunctions:
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-corrected-${self:provider.stage}-preProcess
             ResultPath: $.timeSeries
             TimeoutSeconds: 105
-            Retry:
-              - ErrorEquals:
-                - States.TaskFailed
-                IntervalSeconds: 70
-                MaxAttempts: 1
-                BackoffRate: 2
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -151,12 +127,6 @@ stepFunctions:
                   Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-stattype-router-${self:provider.stage}-determineRoute
                   ResultPath: $.out
                   TimeoutSeconds: 75
-                  Retry:
-                    - ErrorEquals:
-                      - States.TaskFailed
-                      IntervalSeconds: 70
-                      MaxAttempts: 1
-                      BackoffRate: 2
                   Catch:
                     - ErrorEquals:
                       - States.ALL
@@ -179,12 +149,6 @@ stepFunctions:
                     dataType.$: $.out.dataType
                   ResultPath: $.transformResult
                   TimeoutSeconds: 75
-                  Retry:
-                    - ErrorEquals:
-                      - States.TaskFailed
-                      IntervalSeconds: 70
-                      MaxAttempts: 1
-                      BackoffRate: 2
                   Catch:
                     - ErrorEquals:
                       - States.ALL
@@ -198,12 +162,6 @@ stepFunctions:
                   ResultPath: $.loadTimeSeries
                   TimeoutSeconds: 75
                   End: true
-                  Retry:
-                    - ErrorEquals:
-                      - States.TaskFailed
-                      IntervalSeconds: 70
-                      MaxAttempts: 1
-                      BackoffRate: 2
                   Catch:
                     - ErrorEquals:
                       - States.ALL
