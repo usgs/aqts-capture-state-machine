@@ -94,7 +94,7 @@ stepFunctions:
               - ErrorEquals:
                 - States.ALL
                 Next: errorHandler
-            Next: tsTransformMapper
+            Next: defaultSuccess
           tsCorrectedData:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-corrected-${self:provider.stage}-preProcess
