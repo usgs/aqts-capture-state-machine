@@ -149,10 +149,6 @@ stepFunctions:
                     dataType.$: $.out.dataType
                   ResultPath: $.transformResult
                   TimeoutSeconds: 75
-                  Catch:
-                    - ErrorEquals:
-                      - java.lang.RuntimeException
-                      Next: defaultMapSuccess
                     - ErrorEquals:
                       - States.ALL
                       Next: defaultMapFail
