@@ -16,46 +16,63 @@ provider:
 
 custom:
   accountNumber: ${ssm:/iow/aws/accountNumber}
+  tier:
+    TEST: TEST
+    QA: QA
+    PROD-EXTERNAL: PRODDashEXTERNAL
 
 stepFunctions:
   stateMachines:
     aqtsCaptureStateMachine:
+      alarms:
+        topics:
+          alarm:
+            Ref: snsTopic
+        metrics:
+          - executionsFailed
+          - executionThrottled
+        treatMissingData: missing
       role: arn:aws:iam::${self:custom.accountNumber}:role/step-functions-service-access
       name: aqts-capture-state-machine-${self:provider.stage}
       definition:
         Comment: "State machine representing extract, transformation, and load from Aquarius"
-        StartAt: captureInitialLoad
+        StartAt: stateBypass
         States:
+          stateBypass:
+            Type: Choice
+            Default: captureInitialLoad
+            Choices:
+              - Variable: "$.resumeState"
+                StringEquals: captureInitialLoad
+                Next: captureInitialLoad
+              - Variable: "$.resumeState"
+                StringEquals: tsTypeRouterTask
+                Next: tsTypeRouterTask
+              - Variable: "$.resumeState"
+                StringEquals: tsDescriptionList
+                Next: tsDescriptionList
+              - Variable: "$.resumeState"
+                StringEquals: tsCorrectedData
+                Next: tsCorrectedData
+              - Variable: "$.resumeState"
+                StringEquals: tsTransformMapper
+                Next: tsTransformMapper
           captureInitialLoad:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-retriever-capture-raw-load-${self:provider.stage}-iowRetrieverCapture
-            TimeoutSeconds: 60
-            Retry:
-              - ErrorEquals:
-                - States.TaskFailed
-                IntervalSeconds: 10
-                MaxAttempts: 3
-                BackoffRate: 2
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-raw-load-${self:provider.stage}-iowCapture
+            TimeoutSeconds: 120
             Catch:
               - ErrorEquals:
                 - States.ALL
-                ResultPath: "$.error-info"
                 Next: errorHandler
             Next: tsTypeRouterTask
           tsTypeRouterTask:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-ts-type-router-${self:provider.stage}-determineRoute
-            TimeoutSeconds: 60
-            Retry:
-              - ErrorEquals:
-                - States.TaskFailed
-                IntervalSeconds: 3
-                MaxAttempts: 3
-                BackoffRate: 2
+            TimeoutSeconds: 75
             Catch:
               - ErrorEquals:
                 - States.ALL
-                ResultPath: "$.error-info"
                 Next: errorHandler
             Next: tsTypeRouterChoice
           tsTypeRouterChoice:
@@ -70,47 +87,128 @@ stepFunctions:
             Default: defaultSuccess
           tsDescriptionList:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-description-${self:provider.stage}-processTimeSeriesDescription
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-description-${self:provider.stage}-processTsDescription
             ResultPath: $.timeSeries
-            TimeoutSeconds: 60
-            Retry:
-              - ErrorEquals:
-                - States.TaskFailed
-                IntervalSeconds: 3
-                MaxAttempts: 3
-                BackoffRate: 2
+            TimeoutSeconds: 75
             Catch:
               - ErrorEquals:
                 - States.ALL
-                ResultPath: "$.error-info"
                 Next: errorHandler
             Next: defaultSuccess
           tsCorrectedData:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-corrected-${self:provider.stage}-preProcess
             ResultPath: $.timeSeries
-            TimeoutSeconds: 60
-            Retry:
-              - ErrorEquals:
-                - States.TaskFailed
-                IntervalSeconds: 3
-                MaxAttempts: 3
-                BackoffRate: 2
+            TimeoutSeconds: 105
             Catch:
               - ErrorEquals:
                 - States.ALL
-                ResultPath: "$.error-info"
+                Next: errorHandler
+            Next: tsTransformMapper
+          tsTransformMapper:
+            Type: Map
+            Catch:
+              - ErrorEquals:
+                - States.ALL
                 Next: errorHandler
             Next: defaultSuccess
+            ItemsPath: $.timeSeries.timeSeriesList
+            ResultPath: $.timeSeries
+            Parameters:
+              uniqueId.$: $$.Map.Item.Value.uniqueId
+              id.$: $.id
+              type.$: $.type
+            MaxConcurrency: 5
+            Iterator:
+              StartAt: tsDataTypeIdentifier
+              States:
+                tsDataTypeIdentifier:
+                  Type: Task
+                  Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-stattype-router-${self:provider.stage}-determineRoute
+                  ResultPath: $.out
+                  TimeoutSeconds: 75
+                  Catch:
+                    - ErrorEquals:
+                      - States.ALL
+                      Next: defaultMapFail
+                  Next: tsDataTypeRouter
+                tsDataTypeRouter:
+                  Type: Choice
+                  Choices:
+                    - Variable: $.out.dataType
+                      StringEquals: tsDailyValueStatisticalTransform
+                      Next: tsDailyValueStatisticalTransform
+                  Default: defaultMapSuccess
+                tsDailyValueStatisticalTransform:
+                  Type: Task
+                  Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-dvstat-transform-${self:provider.stage}-transform
+                  Parameters:
+                    uniqueId.$: $.uniqueId
+                    id.$: $.id
+                    type.$: $.type
+                    dataType.$: $.out.dataType
+                  ResultPath: $.transformResult
+                  TimeoutSeconds: 75
+                  Catch:
+                    - ErrorEquals:
+                      - States.ALL
+                      Next: defaultMapFail
+                  Next: loadToObservationDb
+                loadToObservationDb:
+                  Type: Task
+                  Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-loader-${self:provider.stage}-loadTimeSeries
+                  Parameters:
+                    uniqueId.$: $.uniqueId
+                  ResultPath: $.loadTimeSeries
+                  TimeoutSeconds: 75
+                  End: true
+                  Catch:
+                    - ErrorEquals:
+                      - States.ALL
+                      Next: defaultMapFail
+                defaultMapSuccess:
+                  Type: Succeed
+                defaultMapFail:
+                  Type: Fail
           errorHandler:
             Type: Task
+            Parameters:
+              "executionArn.$": "$$.Execution.Id"
+              "startInput.$": "$$.Execution.Input"
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-error-handler-${self:provider.stage}-aqtsErrorHandler
-            TimeoutSeconds: 15
+            TimeoutSeconds: 60
             Next: defaultFail
           defaultSuccess:
             Type: Succeed
           defaultFail:
             Type: Fail
+
+resources:
+  Resources:
+    snsTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: ${self:service}-${self:provider.stage}-topic
+        TopicName: ${self:service}-${self:provider.stage}-topic
+    stateDurationAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmName: ${self:service}-${self:provider.stage}-duration-alarm
+        AlarmDescription: Notify when duration exceeds a threshold
+        Namespace: 'AWS/States'
+        Dimensions:
+          - Name: StateMachineArn
+            Value:
+              Ref: AqtsDashcaptureDashstateDashmachineDash${self:custom.tier.${self:provider.stage}}
+        MetricName: ExecutionTime
+        Statistic: Maximum
+        ComparisonOperator: GreaterThanOrEqualToThreshold
+        Period: 60
+        EvaluationPeriods: 1
+        Threshold: 295000  # just under 5 minutes
+        TreatMissingData: missing
+        AlarmActions:
+          - Ref: snsTopic
 
 plugins:
   - serverless-step-functions
