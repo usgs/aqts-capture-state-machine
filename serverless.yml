@@ -84,6 +84,9 @@ stepFunctions:
               - Variable: "$.type"
                 StringEquals: tsCorrectedData
                 Next: tsCorrectedData
+              - Variable: "$.type"
+                StringEquals: discreteGWData
+                Next: defaultSuccess
             Default: defaultSuccess
           tsDescriptionList:
             Type: Task
