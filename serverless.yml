@@ -96,6 +96,9 @@ stepFunctions:
               - Variable: "$.type"
                 StringEquals: tsCorrectedData
                 Next: tsCorrectedData
+              - Variable: "$.type"
+                StringEquals: fieldVisitData
+                Next: defaultSuccess
             Default: defaultSuccess
           tsDescriptionList:
             Type: Task
