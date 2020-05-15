@@ -1,9 +1,9 @@
-@Library(value='iow-ecs-pipeline@1.0.0', changelog=false) _
+@Library(value='iow-ecs-pipeline@2.0.0', changelog=false) _
 
 pipeline {
     agent {
         node {
-            label 'project:any'
+            label 'team:iow'
         }
     }
     parameters {
@@ -15,7 +15,9 @@ pipeline {
     stages {
         stage('run build the zip file for lambda') {
             agent {
-                dockerfile true
+                dockerfile {
+                  label 'team:iow'
+                }
             }
             steps {
                 sh '''

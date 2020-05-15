@@ -17,13 +17,25 @@ provider:
 custom:
   accountNumber: ${ssm:/iow/aws/accountNumber}
   tier:
-    TEST: TEST
-    QA: QA
-    PROD-EXTERNAL: PRODDashEXTERNAL
+    TEST:
+      parsed: TEST
+      lower: test
+    QA:
+      parsed: QA
+      lower: qa
+    PROD-EXTERNAL:
+      parsed: PRODDashEXTERNAL
+      lower: prod-external
 
 stepFunctions:
   stateMachines:
     aqtsCaptureStateMachine:
+      type: EXPRESS
+      loggingConfig:
+        level: ALL
+        includeExecutionData: true
+        destinations:
+          - arn:aws:logs:${self:provider.region}:${self:custom.accountNumber}:log-group:step-functions-${self:custom.tier.${self:provider.stage}.lower}:*
       alarms:
         topics:
           alarm:
@@ -202,7 +214,7 @@ resources:
         Dimensions:
           - Name: StateMachineArn
             Value:
-              Ref: AqtsDashcaptureDashstateDashmachineDash${self:custom.tier.${self:provider.stage}}
+              Ref: AqtsDashcaptureDashstateDashmachineDash${self:custom.tier.${self:provider.stage}.parsed}
         MetricName: ExecutionTime
         Statistic: Maximum
         ComparisonOperator: GreaterThanOrEqualToThreshold
