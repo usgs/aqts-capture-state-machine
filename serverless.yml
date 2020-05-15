@@ -85,7 +85,7 @@ stepFunctions:
                 StringEquals: tsCorrectedData
                 Next: tsCorrectedData
               - Variable: "$.type"
-                StringEquals: discreteGWData
+                StringEquals: fieldVisitData
                 Next: defaultSuccess
             Default: defaultSuccess
           tsDescriptionList:
