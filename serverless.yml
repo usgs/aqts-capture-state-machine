@@ -102,7 +102,7 @@ stepFunctions:
                 Next: errorHandler
             Next: tsTransformMapper
           tsFieldVisit:
-            Type: tsTypeRouterTask
+            Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-field-visit-${self:provider.stage}-preProcess
             ResultPath: $.timeSeries
             TimeoutSeconds: 105
