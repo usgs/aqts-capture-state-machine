@@ -79,7 +79,7 @@ stepFunctions:
                 Next: tsCorrectedData
               - Variable: "$.type"
                 StringEquals: fieldVisitData
-                Next: defaultSuccess
+                Next: tsFieldVisit
             Default: defaultSuccess
           tsDescriptionList:
             Type: Task
@@ -101,6 +101,16 @@ stepFunctions:
                 - States.ALL
                 Next: errorHandler
             Next: tsTransformMapper
+          tsFieldVisit:
+            Type: tsTypeRouterTask
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-field-visit-${self:provider.stage}-preProcess
+            ResultPath: $.timeSeries
+            TimeoutSeconds: 105
+            Catch:
+              - ErrorEquals:
+                - States.ALL
+                Next: errorHandler
+            Next: defaultSuccess
           tsTransformMapper:
             Type: Map
             Catch:
