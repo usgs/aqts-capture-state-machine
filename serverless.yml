@@ -116,6 +116,7 @@ stepFunctions:
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-field-visit-${self:provider.stage}-transform
             Parameters:
               id.$: $.id
+              type.$: $.type
             ResultPath: $.fieldVisitTransform
             TimeoutSeconds: 105
             Catch:
