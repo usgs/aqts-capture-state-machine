@@ -113,7 +113,7 @@ stepFunctions:
             Next: fieldVisitTransform
           fieldVisitTransform:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-field-visit-transform-${self:provider.stage}-transformFieldVisit
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-field-visit-transform-${self:provider.stage}-transform
             Parameters:
               id.$: $.id
               type.$: $.type
