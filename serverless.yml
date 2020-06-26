@@ -104,7 +104,7 @@ stepFunctions:
           tsFieldVisit:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-field-visit-${self:provider.stage}-preProcess
-            ResultPath: $.timeSeries
+            ResultPath: $.fieldVisit
             TimeoutSeconds: 105
             Catch:
               - ErrorEquals:
@@ -117,7 +117,7 @@ stepFunctions:
             Parameters:
               id.$: $.id
               type.$: $.type
-            ResultPath: $.fieldVisitTransform
+            ResultPath: $.fieldVisit
             TimeoutSeconds: 105
             Catch:
               - ErrorEquals:
