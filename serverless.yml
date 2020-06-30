@@ -123,7 +123,17 @@ stepFunctions:
               - ErrorEquals:
                   - States.ALL
                 Next: errorHandler
-            Next: defaultSuccess
+            Next: loadDiscreteGW
+          loadDiscreteGW:
+            Type: Task
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-discrete-loader-${self:provider.stage}-loadDiscrete
+            ResultPath: $.loadDiscreteGW
+            TimeoutSeconds: 75
+            End: true
+            Catch:
+              - ErrorEquals:
+                  - States.ALL
+                Next: errorHandler
           tsTransformMapper:
             Type: Map
             Catch:
