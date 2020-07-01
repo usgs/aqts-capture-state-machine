@@ -100,7 +100,7 @@ stepFunctions:
               - ErrorEquals:
                 - States.ALL
                 Next: errorHandler
-            Next: tsTransformMapper
+            Next: tsDataTypeIdentifier
           tsFieldVisit:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-field-visit-${self:provider.stage}-preProcess
@@ -135,71 +135,48 @@ stepFunctions:
               - ErrorEquals:
                   - States.ALL
                 Next: errorHandler
-          tsTransformMapper:
-            Type: Map
+          tsDataTypeIdentifier:
+            Type: Task
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-stattype-router-${self:provider.stage}-determineRoute
+            ResultPath: $.out
+            TimeoutSeconds: 75
             Catch:
               - ErrorEquals:
                 - States.ALL
                 Next: errorHandler
-            Next: defaultSuccess
-            ItemsPath: $.timeSeries.timeSeriesList
-            ResultPath: $.timeSeries
+            Next: tsDataTypeRouter
+          tsDataTypeRouter:
+            Type: Choice
+            Choices:
+              - Variable: $.out.dataType
+                StringEquals: tsDailyValueStatisticalTransform
+                Next: tsDailyValueStatisticalTransform
+            Default: defaultMapSuccess
+          tsDailyValueStatisticalTransform:
+            Type: Task
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-dvstat-transform-${self:provider.stage}-transform
             Parameters:
-              uniqueId.$: $$.Map.Item.Value.uniqueId
+              uniqueId.$: $.uniqueId
               id.$: $.id
               type.$: $.type
-            MaxConcurrency: 5
-            Iterator:
-              StartAt: tsDataTypeIdentifier
-              States:
-                tsDataTypeIdentifier:
-                  Type: Task
-                  Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-stattype-router-${self:provider.stage}-determineRoute
-                  ResultPath: $.out
-                  TimeoutSeconds: 75
-                  Catch:
-                    - ErrorEquals:
-                      - States.ALL
-                      Next: defaultMapFail
-                  Next: tsDataTypeRouter
-                tsDataTypeRouter:
-                  Type: Choice
-                  Choices:
-                    - Variable: $.out.dataType
-                      StringEquals: tsDailyValueStatisticalTransform
-                      Next: tsDailyValueStatisticalTransform
-                  Default: defaultMapSuccess
-                tsDailyValueStatisticalTransform:
-                  Type: Task
-                  Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-dvstat-transform-${self:provider.stage}-transform
-                  Parameters:
-                    uniqueId.$: $.uniqueId
-                    id.$: $.id
-                    type.$: $.type
-                    dataType.$: $.out.dataType
-                  ResultPath: $.transformResult
-                  TimeoutSeconds: 75
-                  Catch:
-                    - ErrorEquals:
-                      - States.ALL
-                      Next: defaultMapFail
-                  Next: loadToObservationDb
-                loadToObservationDb:
-                  Type: Task
-                  Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-loader-${self:provider.stage}-loadTimeSeries
-                  Parameters:
-                    uniqueId.$: $.uniqueId
-                  ResultPath: $.loadTimeSeries
-                  TimeoutSeconds: 75
-                  End: true
-                  Catch:
-                    - ErrorEquals:
-                      - States.ALL
-                      Next: defaultMapFail
-                defaultMapSuccess:
-                  Type: Succeed
-                defaultMapFail:
-                  Type: Fail
+              dataType.$: $.out.dataType
+            ResultPath: $.transformResult
+            TimeoutSeconds: 75
+            Catch:
+              - ErrorEquals:
+                - States.ALL
+                Next: errorHandler
+            Next: loadToObservationDb
+          loadToObservationDb:
+            Type: Task
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-loader-${self:provider.stage}-loadTimeSeries
+            ResultPath: $.loadTimeSeries
+            TimeoutSeconds: 75
+            End: true
+            Catch:
+              - ErrorEquals:
+                - States.ALL
+                Next: errorHandler
           errorHandler:
             Type: Task
             Parameters:
