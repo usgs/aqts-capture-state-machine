@@ -138,6 +138,7 @@ stepFunctions:
           tsDataTypeIdentifier:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-stattype-router-${self:provider.stage}-determineRoute
+            InputPath: $.timeSeries.timeSeries
             ResultPath: $.out
             TimeoutSeconds: 75
             Catch:
