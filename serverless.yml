@@ -151,7 +151,7 @@ stepFunctions:
               - Variable: $.out.dataType
                 StringEquals: tsDailyValueStatisticalTransform
                 Next: tsDailyValueStatisticalTransform
-            Default: defaultMapSuccess
+            Default: defaultSuccess
           tsDailyValueStatisticalTransform:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-dvstat-transform-${self:provider.stage}-transform
