@@ -172,6 +172,8 @@ stepFunctions:
             Next: loadToObservationDb
           loadToObservationDb:
             Type: Task
+            Parameters:
+              uniqueId.$: $.timeSeries.timeSeries.uniqueId
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-loader-${self:provider.stage}-loadTimeSeries
             ResultPath: $.loadTimeSeries
             TimeoutSeconds: 75
