@@ -161,6 +161,7 @@ stepFunctions:
             Parameters:
               uniqueId.$: $.timeSeries.timeSeries.uniqueId
               type.$: $.type
+              id.$: $.id
               dataType.$: $.out.dataType
             ResultPath: $.transformResult
             TimeoutSeconds: 75
