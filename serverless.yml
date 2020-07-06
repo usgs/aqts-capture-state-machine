@@ -159,8 +159,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-dvstat-transform-${self:provider.stage}-transform
             Parameters:
-              uniqueId.$: $.uniqueId
-              id.$: $.id
+              uniqueId.$: $.timeSeries.timeSeries.uniqueId
               type.$: $.type
               dataType.$: $.out.dataType
             ResultPath: $.transformResult
