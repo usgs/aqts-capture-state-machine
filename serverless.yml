@@ -139,7 +139,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-stattype-router-${self:provider.stage}-determineRoute
             Parameters:
-              uniqueId.$: $.timesSeries.timeSeries.uniqueId
+              uniqueId.$: $.timeSeries.timeSeries.uniqueId
               type.$: $.type
             ResultPath: $.out
             TimeoutSeconds: 75
