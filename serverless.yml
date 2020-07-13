@@ -138,7 +138,7 @@ stepFunctions:
           tsDataTypeRouter:
             Type: Choice
             Choices:
-              - Variable: $.out.dataType
+              - Variable: $.timeSeries.timeSeries.dataType
                 StringEquals: tsDailyValueStatisticalTransform
                 Next: tsDailyValueStatisticalTransform
             Default: defaultSuccess
@@ -149,7 +149,7 @@ stepFunctions:
               uniqueId.$: $.timeSeries.timeSeries.uniqueId
               type.$: $.type
               id.$: $.id
-              dataType.$: $.out.dataType
+              dataType.$: $.timeSeries.timeSeries.dataType
             ResultPath: $.transformResult
             TimeoutSeconds: 75
             Catch:
