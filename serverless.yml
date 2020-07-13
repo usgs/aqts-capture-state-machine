@@ -100,7 +100,7 @@ stepFunctions:
               - ErrorEquals:
                 - States.ALL
                 Next: errorHandler
-            Next: tsDataTypeIdentifier
+            Next: tsDataTypeRouter
           tsFieldVisit:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-field-visit-${self:provider.stage}-preProcess
@@ -135,23 +135,10 @@ stepFunctions:
               - ErrorEquals:
                   - States.ALL
                 Next: errorHandler
-          tsDataTypeIdentifier:
-            Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-stattype-router-${self:provider.stage}-determineRoute
-            Parameters:
-              uniqueId.$: $.timeSeries.timeSeries.uniqueId
-              type.$: $.type
-            ResultPath: $.out
-            TimeoutSeconds: 75
-            Catch:
-              - ErrorEquals:
-                - States.ALL
-                Next: errorHandler
-            Next: tsDataTypeRouter
           tsDataTypeRouter:
             Type: Choice
             Choices:
-              - Variable: $.out.dataType
+              - Variable: $.timeSeries.timeSeries.dataType
                 StringEquals: tsDailyValueStatisticalTransform
                 Next: tsDailyValueStatisticalTransform
             Default: defaultSuccess
@@ -162,7 +149,7 @@ stepFunctions:
               uniqueId.$: $.timeSeries.timeSeries.uniqueId
               type.$: $.type
               id.$: $.id
-              dataType.$: $.out.dataType
+              dataType.$: $.timeSeries.timeSeries.dataType
             ResultPath: $.transformResult
             TimeoutSeconds: 75
             Catch:
