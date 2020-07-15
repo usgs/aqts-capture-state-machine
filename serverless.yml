@@ -161,11 +161,11 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-dvstat-transform-${self:provider.stage}-transform
             Parameters:
-              uniqueId.$: $.tsCorrectedResult.uniqueId
+              uniqueId.$: $.tsCorrectedResult.timeSeries.uniqueId
               type.$: $.tsTypeRouterResult.type
               id.$: $.id
               partitionNumber: $.partitionNumber
-              dataType.$: $.tsCorrectedResult.dataType
+              dataType.$: $.tsCorrectedResult.timeSeries.dataType
             ResultPath: $.dvstatTransformResult
             TimeoutSeconds: 75
             Catch:
@@ -176,7 +176,7 @@ stepFunctions:
           loadToObservationDb:
             Type: Task
             Parameters:
-              uniqueId.$: $.tsCorrectedResult.uniqueId
+              uniqueId.$: $.tsCorrectedResult.timeSeries.uniqueId
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-loader-${self:provider.stage}-loadTimeSeries
             ResultPath: $.loadTimeSeriesResult
             TimeoutSeconds: 75
