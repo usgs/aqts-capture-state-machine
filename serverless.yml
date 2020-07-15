@@ -164,7 +164,7 @@ stepFunctions:
               uniqueId.$: $.tsCorrectedResult.timeSeries.uniqueId
               type.$: $.tsTypeRouterResult.type
               id.$: $.id
-              partitionNumber: $.partitionNumber
+              partitionNumber.$: $.partitionNumber
               dataType.$: $.tsCorrectedResult.timeSeries.dataType
             ResultPath: $.dvstatTransformResult
             TimeoutSeconds: 75
