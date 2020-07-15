@@ -142,7 +142,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-discrete-loader-${self:provider.stage}-loadDiscrete
             Parameters:
-              fieldVisitIdentifiers.$: $.fieldVisitTransformResult
+              fieldVisitIdentifiers.$: $.fieldVisitTransformResult.fieldVisitIdentifiers
             ResultPath: $.loadDiscreteGWResult
             TimeoutSeconds: 75
             End: true
