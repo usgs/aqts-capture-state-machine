@@ -130,7 +130,7 @@ stepFunctions:
             Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
-              type.$: $.type
+              type.$: $.tsTypeRouterResult.type
             ResultPath: $.fieldVisitTransformResult
             TimeoutSeconds: 105
             Catch:
@@ -162,7 +162,7 @@ stepFunctions:
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-dvstat-transform-${self:provider.stage}-transform
             Parameters:
               uniqueId.$: $.tsCorrectedResult.uniqueId
-              type.$: $.type
+              type.$: $.tsTypeRouterResult.type
               id.$: $.id
               partitionNumber: $.partitionNumber
               dataType.$: $.tsCorrectedResult.dataType
