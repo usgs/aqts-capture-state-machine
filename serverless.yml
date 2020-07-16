@@ -62,6 +62,10 @@ stepFunctions:
           tsTypeRouterTask:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-ts-type-router-${self:provider.stage}-determineRoute
+            Parameters: 
+              id.$: $.id
+              partitionNumber.$: $.partitionNumber
+            ResultPath: $.tsTypeRouterResult
             TimeoutSeconds: 75
             Catch:
               - ErrorEquals:
@@ -71,20 +75,23 @@ stepFunctions:
           tsTypeRouterChoice:
             Type: Choice
             Choices:
-              - Variable: "$.type"
+              - Variable: "$.tsTypeRouterResult.type"
                 StringEquals: tsDescriptionList
                 Next: tsDescriptionList
-              - Variable: "$.type"
+              - Variable: "$.tsTypeRouterResult.type"
                 StringEquals: tsCorrectedData
                 Next: tsCorrectedData
-              - Variable: "$.type"
+              - Variable: "$.tsTypeRouterResult.type"
                 StringEquals: fieldVisitData
                 Next: tsFieldVisit
             Default: defaultSuccess
           tsDescriptionList:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-description-${self:provider.stage}-processTsDescription
-            ResultPath: $.timeSeries
+            Parameters: 
+              id.$: $.id
+              partitionNumber.$: $.partitionNumber
+            ResultPath: $.tsDescriptionResult
             TimeoutSeconds: 75
             Catch:
               - ErrorEquals:
@@ -94,7 +101,10 @@ stepFunctions:
           tsCorrectedData:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-corrected-${self:provider.stage}-preProcess
-            ResultPath: $.timeSeries
+            Parameters: 
+              id.$: $.id
+              partitionNumber.$: $.partitionNumber
+            ResultPath: $.tsCorrectedResult
             TimeoutSeconds: 105
             Catch:
               - ErrorEquals:
@@ -104,7 +114,10 @@ stepFunctions:
           tsFieldVisit:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-field-visit-${self:provider.stage}-preProcess
-            ResultPath: $.fieldVisit
+            Parameters: 
+              id.$: $.id
+              partitionNumber.$: $.partitionNumber
+            ResultPath: $.tsFieldVisitResult
             TimeoutSeconds: 105
             Catch:
               - ErrorEquals:
@@ -116,8 +129,9 @@ stepFunctions:
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-field-visit-transform-${self:provider.stage}-transform
             Parameters:
               id.$: $.id
-              type.$: $.type
-            ResultPath: $.fieldVisit
+              partitionNumber.$: $.partitionNumber
+              type.$: $.tsTypeRouterResult.type
+            ResultPath: $.fieldVisitTransformResult
             TimeoutSeconds: 105
             Catch:
               - ErrorEquals:
@@ -127,8 +141,9 @@ stepFunctions:
           loadDiscreteGW:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-discrete-loader-${self:provider.stage}-loadDiscrete
-            InputPath: $.fieldVisit
-            ResultPath: $.loadDiscreteGW
+            Parameters:
+              fieldVisitIdentifiers.$: $.fieldVisitTransformResult.fieldVisitIdentifiers
+            ResultPath: $.loadDiscreteGWResult
             TimeoutSeconds: 75
             End: true
             Catch:
@@ -138,7 +153,7 @@ stepFunctions:
           tsDataTypeRouter:
             Type: Choice
             Choices:
-              - Variable: $.timeSeries.timeSeries.dataType
+              - Variable: $.tsCorrectedResult.timeSeries.dataType
                 StringEquals: tsDailyValueStatisticalTransform
                 Next: tsDailyValueStatisticalTransform
             Default: defaultSuccess
@@ -146,11 +161,12 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-dvstat-transform-${self:provider.stage}-transform
             Parameters:
-              uniqueId.$: $.timeSeries.timeSeries.uniqueId
-              type.$: $.type
+              uniqueId.$: $.tsCorrectedResult.timeSeries.uniqueId
+              type.$: $.tsTypeRouterResult.type
               id.$: $.id
-              dataType.$: $.timeSeries.timeSeries.dataType
-            ResultPath: $.transformResult
+              partitionNumber.$: $.partitionNumber
+              dataType.$: $.tsCorrectedResult.timeSeries.dataType
+            ResultPath: $.dvstatTransformResult
             TimeoutSeconds: 75
             Catch:
               - ErrorEquals:
@@ -160,9 +176,9 @@ stepFunctions:
           loadToObservationDb:
             Type: Task
             Parameters:
-              uniqueId.$: $.timeSeries.timeSeries.uniqueId
+              uniqueId.$: $.tsCorrectedResult.timeSeries.uniqueId
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-loader-${self:provider.stage}-loadTimeSeries
-            ResultPath: $.loadTimeSeries
+            ResultPath: $.loadTimeSeriesResult
             TimeoutSeconds: 75
             End: true
             Catch:
