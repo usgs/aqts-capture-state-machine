@@ -84,6 +84,9 @@ stepFunctions:
               - Variable: "$.tsTypeRouterResult.type"
                 StringEquals: fieldVisitData
                 Next: tsFieldVisit
+              - Variable: "$.tsTypeRouterResult.type"
+                StringEquals: fieldVisitReadings
+                Next: tsFieldVisitReadings
             Default: defaultSuccess
           tsDescriptionList:
             Type: Task
@@ -115,6 +118,19 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-field-visit-${self:provider.stage}-preProcess
             Parameters: 
+              id.$: $.id
+              partitionNumber.$: $.partitionNumber
+            ResultPath: $.tsFieldVisitResult
+            TimeoutSeconds: 105
+            Catch:
+              - ErrorEquals:
+                - States.ALL
+                Next: errorHandler
+            Next: fieldVisitTransform
+          tsFieldVisitReadings:
+            Type: Task
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-field-visit-metadata${self:provider.stage}-preProcess
+            Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsFieldVisitResult
