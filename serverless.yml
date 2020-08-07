@@ -143,6 +143,7 @@ stepFunctions:
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-discrete-loader-${self:provider.stage}-loadDiscrete
             Parameters:
               locationIdentifier.$: $.fieldVisitTransformResult.locationIdentifier
+              monitoringLocationIdentifier.$: $.fieldVisitTransformResult.monitoringLocationIdentifier
             ResultPath: $.loadDiscreteGWResult
             TimeoutSeconds: 75
             End: true
