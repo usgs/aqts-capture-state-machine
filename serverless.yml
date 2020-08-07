@@ -133,13 +133,13 @@ stepFunctions:
             Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
-            ResultPath: $.tsFieldVisitResult
+            ResultPath: $.tsFieldVisitReadingsResult
             TimeoutSeconds: 105
             Catch:
               - ErrorEquals:
                 - States.ALL
                 Next: errorHandler
-            Next: fieldVisitTransform
+            Next: defaultSuccess
           fieldVisitTransform:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-field-visit-transform-${self:provider.stage}-transform
