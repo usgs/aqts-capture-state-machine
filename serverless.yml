@@ -129,7 +129,7 @@ stepFunctions:
             Next: fieldVisitTransform
           tsFieldVisitReadings:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-field-visit-metadata${self:provider.stage}-preProcess
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-field-visit-metadata-${self:provider.stage}-preProcess
             Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
