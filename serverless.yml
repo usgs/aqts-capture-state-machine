@@ -62,7 +62,7 @@ stepFunctions:
           tsTypeRouterTask:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-ts-type-router-${self:provider.stage}-determineRoute
-            Parameters: 
+            Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsTypeRouterResult
@@ -81,9 +81,21 @@ stepFunctions:
               - Variable: "$.tsTypeRouterResult.type"
                 StringEquals: tsCorrectedData
                 Next: tsCorrectedData
+              - And:
+                - Variable: "$.tsTypeRouterResult.type"
+                  StringEquals: fieldVisitData
+                - Variable: "$.Stage"
+                  StringEquals: "PROD-EXTERNAL"
+                Next: defaultSuccess
+              - And:
+                - Variable: "$.tsTypeRouterResult.type"
+                  StringEquals: fieldVisitReadings
+                - Variable: "$.Stage"
+                  StringEquals: "PROD-EXTERNAL"
+                Next: defaultSuccess
               - Variable: "$.tsTypeRouterResult.type"
                 StringEquals: fieldVisitData
-                Next: tsFieldVisit
+                Next: tsFieldVisit           
               - Variable: "$.tsTypeRouterResult.type"
                 StringEquals: fieldVisitReadings
                 Next: tsFieldVisitReadings
@@ -91,7 +103,7 @@ stepFunctions:
           tsDescriptionList:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-description-${self:provider.stage}-processTsDescription
-            Parameters: 
+            Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsDescriptionResult
@@ -104,7 +116,7 @@ stepFunctions:
           tsCorrectedData:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-corrected-${self:provider.stage}-preProcess
-            Parameters: 
+            Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsCorrectedResult
@@ -117,7 +129,7 @@ stepFunctions:
           tsFieldVisit:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-field-visit-${self:provider.stage}-preProcess
-            Parameters: 
+            Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsFieldVisitResult
