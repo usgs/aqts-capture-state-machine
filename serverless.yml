@@ -50,6 +50,15 @@ stepFunctions:
         Comment: "State machine representing extract, transformation, and load from Aquarius"
         StartAt: captureInitialLoad
         States:
+          captureInitialLoadRouter:
+            Type: Choice
+            Choices:
+              - Variable: "$.Record.s3.object.size"
+                NumericLessThanEquals: 50000
+                Next: captureInitialLoad
+              - Variable: "$.Record.s3.object.size"
+                NumericGreaterThan: 50000
+                Next: captureInitialLoadMedium
           captureInitialLoad:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-raw-load-${self:provider.stage}-iowCapture
@@ -59,10 +68,19 @@ stepFunctions:
                 - States.ALL
                 Next: errorHandler
             Next: tsTypeRouterTask
+          captureInitialLoadMedium:
+            Type: Task
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-raw-load-${self:provider.stage}-iowCaptureMedium
+            TimeoutSeconds: 120
+            Catch:
+              - ErrorEquals:
+                - States.ALL
+                Next: errorHandler
+            Next: tsTypeRouterTask
           tsTypeRouterTask:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-ts-type-router-${self:provider.stage}-determineRoute
-            Parameters: 
+            Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsTypeRouterResult
@@ -91,7 +109,7 @@ stepFunctions:
           tsDescriptionList:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-description-${self:provider.stage}-processTsDescription
-            Parameters: 
+            Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsDescriptionResult
@@ -104,7 +122,7 @@ stepFunctions:
           tsCorrectedData:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-corrected-${self:provider.stage}-preProcess
-            Parameters: 
+            Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsCorrectedResult
@@ -117,7 +135,7 @@ stepFunctions:
           tsFieldVisit:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-field-visit-${self:provider.stage}-preProcess
-            Parameters: 
+            Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsFieldVisitResult
