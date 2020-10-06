@@ -85,13 +85,13 @@ stepFunctions:
                 - Variable: "$.tsTypeRouterResult.type"
                   StringEquals: fieldVisitData
                 - Variable: "$$.StateMachine.Name"
-                  StringGreaterThan: "PROD-EXTERNAL"
+                  StringEquals: "aqts-capture-state-machine-PROD-EXTERNAL"
                 Next: defaultSuccess
               - And:
                 - Variable: "$.tsTypeRouterResult.type"
                   StringEquals: fieldVisitReadings
                 - Variable: "$$.StateMachine.Name"
-                  StringGreaterThan: "PROD-EXTERNAL"
+                  StringEquals: "aqts-capture-state-machine-PROD-EXTERNAL"
                 Next: defaultSuccess
               - Variable: "$.tsTypeRouterResult.type"
                 StringEquals: fieldVisitData
