@@ -84,18 +84,18 @@ stepFunctions:
               - And:
                 - Variable: "$.tsTypeRouterResult.type"
                   StringEquals: fieldVisitData
-                - Variable: "$.Stage"
-                  StringEquals: "PROD-EXTERNAL"
+                - Variable: "$$.StateMachine.Name"
+                  StringGreaterThan: "PROD-EXTERNAL"
                 Next: defaultSuccess
               - And:
                 - Variable: "$.tsTypeRouterResult.type"
                   StringEquals: fieldVisitReadings
-                - Variable: "$.Stage"
-                  StringEquals: "PROD-EXTERNAL"
+                - Variable: "$$.StateMachine.Name"
+                  StringGreaterThan: "PROD-EXTERNAL"
                 Next: defaultSuccess
               - Variable: "$.tsTypeRouterResult.type"
                 StringEquals: fieldVisitData
-                Next: tsFieldVisit           
+                Next: tsFieldVisit
               - Variable: "$.tsTypeRouterResult.type"
                 StringEquals: fieldVisitReadings
                 Next: tsFieldVisitReadings
