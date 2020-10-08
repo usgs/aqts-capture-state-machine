@@ -50,9 +50,27 @@ stepFunctions:
         Comment: "State machine representing extract, transformation, and load from Aquarius"
         StartAt: captureInitialLoad
         States:
+          captureInitialLoadRouter:
+            Type: Choice
+            Choices:
+              - Variable: "$.Record.s3.object.size"
+                NumericLessThanEquals: 50000
+                Next: captureInitialLoad
+              - Variable: "$.Record.s3.object.size"
+                NumericGreaterThan: 50000
+                Next: captureInitialLoadMedium
           captureInitialLoad:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-raw-load-${self:provider.stage}-iowCapture
+            TimeoutSeconds: 120
+            Catch:
+              - ErrorEquals:
+                - States.ALL
+                Next: errorHandler
+            Next: tsTypeRouterTask
+          captureInitialLoadMedium:
+            Type: Task
+            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-raw-load-${self:provider.stage}-iowCaptureMedium
             TimeoutSeconds: 120
             Catch:
               - ErrorEquals:
