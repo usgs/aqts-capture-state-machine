@@ -48,7 +48,7 @@ stepFunctions:
       name: aqts-capture-state-machine-${self:provider.stage}
       definition:
         Comment: "State machine representing extract, transformation, and load from Aquarius"
-        StartAt: captureInitialLoad
+        StartAt: captureInitialLoadRouter
         States:
           captureInitialLoadRouter:
             Type: Choice
