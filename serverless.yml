@@ -156,7 +156,7 @@ stepFunctions:
               - ErrorEquals:
                 - States.ALL
                 Next: errorHandler
-            Next: defaultSuccess
+            Next: fieldVisitTransform
           tsFieldVisitReadings:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-field-visit-metadata-${self:provider.stage}-preProcess
@@ -169,7 +169,7 @@ stepFunctions:
               - ErrorEquals:
                 - States.ALL
                 Next: errorHandler
-            Next: fieldVisitTransform
+            Next: tsFieldVisit
           fieldVisitTransform:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-field-visit-transform-${self:provider.stage}-transform
