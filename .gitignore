@@ -1,2 +1,4 @@
 /.project
 .idea/
+.serverless/
+node_modules/

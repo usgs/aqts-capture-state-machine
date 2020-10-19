@@ -5,7 +5,7 @@ provider:
   region: ${opt:region, 'us-west-2'}
   stage: ${opt:stage, 'TEST'}
   deploymentBucket:
-    name: iow-cloud-applications
+    name: ${opt:bucket, iow-cloud-applications}
   stackTags:
     "wma:applicationId": "Aquarius TS Capture State Machine"
     "wma:contact": "Andrew Yan ayan@usgs.gov"
@@ -17,7 +17,6 @@ provider:
     "displayName": "State Machine"
 
 custom:
-  accountNumber: ${ssm:/iow/aws/accountNumber}
   tier:
     TEST:
       parsed: TEST
@@ -37,7 +36,7 @@ stepFunctions:
         level: ALL
         includeExecutionData: true
         destinations:
-          - arn:aws:logs:${self:provider.region}:${self:custom.accountNumber}:log-group:step-functions-${self:custom.tier.${self:provider.stage}.lower}:*
+          - arn:aws:logs:${self:provider.region}:#{AWS::AccountId}:log-group:step-functions-${self:custom.tier.${self:provider.stage}.lower}:*
       alarms:
         topics:
           alarm:
@@ -46,7 +45,7 @@ stepFunctions:
           - executionsFailed
           - executionThrottled
         treatMissingData: missing
-      role: arn:aws:iam::${self:custom.accountNumber}:role/step-functions-service-access
+      role: arn:aws:iam::#{AWS::AccountId}:role/step-functions-service-access
       name: aqts-capture-state-machine-${self:provider.stage}
       definition:
         Comment: "State machine representing extract, transformation, and load from Aquarius"
@@ -63,7 +62,7 @@ stepFunctions:
                 Next: captureInitialLoadMedium
           captureInitialLoad:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-raw-load-${self:provider.stage}-iowCapture
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-raw-load-${self:provider.stage}-iowCapture
             TimeoutSeconds: 120
             Catch:
               - ErrorEquals:
@@ -72,7 +71,7 @@ stepFunctions:
             Next: tsTypeRouterTask
           captureInitialLoadMedium:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-raw-load-${self:provider.stage}-iowCaptureMedium
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-raw-load-${self:provider.stage}-iowCaptureMedium
             TimeoutSeconds: 120
             Catch:
               - ErrorEquals:
@@ -81,7 +80,7 @@ stepFunctions:
             Next: tsTypeRouterTask
           tsTypeRouterTask:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-ts-type-router-${self:provider.stage}-determineRoute
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-ts-type-router-${self:provider.stage}-determineRoute
             Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
@@ -122,7 +121,7 @@ stepFunctions:
             Default: defaultSuccess
           tsDescriptionList:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-description-${self:provider.stage}-processTsDescription
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-ts-description-${self:provider.stage}-processTsDescription
             Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
@@ -135,7 +134,7 @@ stepFunctions:
             Next: defaultSuccess
           tsCorrectedData:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-corrected-${self:provider.stage}-preProcess
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-ts-corrected-${self:provider.stage}-preProcess
             Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
@@ -148,7 +147,7 @@ stepFunctions:
             Next: tsDataTypeRouter
           tsFieldVisit:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-field-visit-${self:provider.stage}-preProcess
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-ts-field-visit-${self:provider.stage}-preProcess
             Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
@@ -161,7 +160,7 @@ stepFunctions:
             Next: fieldVisitTransform
           tsFieldVisitReadings:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-field-visit-metadata-${self:provider.stage}-preProcess
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-field-visit-metadata-${self:provider.stage}-preProcess
             Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
@@ -174,7 +173,7 @@ stepFunctions:
             Next: tsFieldVisit
           fieldVisitTransform:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-field-visit-transform-${self:provider.stage}-transform
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-field-visit-transform-${self:provider.stage}-transform
             Parameters:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
@@ -188,7 +187,7 @@ stepFunctions:
             Next: loadDiscreteGW
           loadDiscreteGW:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-discrete-loader-${self:provider.stage}-loadDiscrete
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-discrete-loader-${self:provider.stage}-loadDiscrete
             Parameters:
               locationIdentifier.$: $.fieldVisitTransformResult.locationIdentifier
               monitoringLocationIdentifier.$: $.fieldVisitTransformResult.monitoringLocationIdentifier
@@ -208,7 +207,7 @@ stepFunctions:
             Default: defaultSuccess
           tsDailyValueStatisticalTransform:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-dvstat-transform-${self:provider.stage}-transform
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-dvstat-transform-${self:provider.stage}-transform
             Parameters:
               uniqueId.$: $.tsCorrectedResult.timeSeries.uniqueId
               type.$: $.tsTypeRouterResult.type
@@ -226,7 +225,7 @@ stepFunctions:
             Type: Task
             Parameters:
               uniqueId.$: $.tsCorrectedResult.timeSeries.uniqueId
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-ts-loader-${self:provider.stage}-loadTimeSeries
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-ts-loader-${self:provider.stage}-loadTimeSeries
             ResultPath: $.loadTimeSeriesResult
             TimeoutSeconds: 75
             End: true
@@ -239,7 +238,7 @@ stepFunctions:
             Parameters:
               "executionArn.$": "$$.Execution.Id"
               "startInput.$": "$$.Execution.Input"
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-error-handler-${self:provider.stage}-aqtsErrorHandler
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-error-handler-${self:provider.stage}-aqtsErrorHandler
             TimeoutSeconds: 60
             Next: defaultFail
           defaultSuccess:
@@ -277,3 +276,4 @@ resources:
 plugins:
   - serverless-step-functions
   - serverless-plugin-git-variables
+  - serverless-pseudo-parameters
