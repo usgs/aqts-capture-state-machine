@@ -18,6 +18,9 @@ provider:
 
 custom:
   tier:
+    DEV:
+      parsed: DEV
+      lower: dev
     TEST:
       parsed: TEST
       lower: test
