@@ -9,6 +9,9 @@ provider:
   stackTags:
     "wma:applicationId": "Aquarius TS Capture State Machine"
     "wma:contact": "Andrew Yan ayan@usgs.gov"
+    "wma:role": etl
+    "wma:system": NWIS
+    "wma:subSystem": NWISWeb-Capture
     "wma:environment": ${self:provider.stage}
     "wma:taggingVersion": 0.0.1
     "wma:costCenter": TBD
