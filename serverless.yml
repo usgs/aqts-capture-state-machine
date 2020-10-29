@@ -76,7 +76,7 @@ stepFunctions:
                   NumericLessThanEquals: 51200000
                 Next: captureInitialLoad
               - Variable: "$.Record.s3.object.size"
-                NumericGreaterThan: 150000000
+                NumericGreaterThan: 51200000
                 Next: captureInitialLoadMedium
           captureInitialLoadExtraSmall:
             Type: Task
