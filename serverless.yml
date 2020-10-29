@@ -61,16 +61,16 @@ stepFunctions:
             Type: Choice
             Choices:
               - Variable: "$.Record.s3.object.size"
-                NumericLessThanEquals: 25600000
+                NumericLessThanEquals: 19200000
                 Next: captureInitialLoadSmall
               - And:
                 - Variable: "$.Record.s3.object.size"
-                  NumericGreaterThan: 25600000
+                  NumericGreaterThan: 19200000
                 - Variable: "$.Record.s3.object.size"
-                  NumericLessThanEquals: 51200000
+                  NumericLessThanEquals: 38400000
                 Next: captureInitialLoad
               - Variable: "$.Record.s3.object.size"
-                NumericGreaterThan: 51200000
+                NumericGreaterThan: 38400000
                 Next: captureInitialLoadMedium
           captureInitialLoadSmall:
             Type: Task
