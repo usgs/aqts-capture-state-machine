@@ -74,7 +74,7 @@ stepFunctions:
                 Next: captureInitialLoadMedium
           captureInitialLoadSmall:
             Type: Task
-            Resource: arn:aws:lambda:${self:provider.region}:${self:custom.accountNumber}:function:aqts-capture-raw-load-${self:provider.stage}-iowCaptureSmall
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-raw-load-${self:provider.stage}-iowCaptureSmall
             TimeoutSeconds: 120
             Catch:
               - ErrorEquals:
