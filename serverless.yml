@@ -62,16 +62,31 @@ stepFunctions:
             Choices:
               - Variable: "$.Record.s3.object.size"
                 NumericLessThanEquals: 19200000
-                Next: captureInitialLoadSmall
+                Next: captureInitialLoadExtraSmall
               - And:
                 - Variable: "$.Record.s3.object.size"
                   NumericGreaterThan: 19200000
                 - Variable: "$.Record.s3.object.size"
                   NumericLessThanEquals: 38400000
+                Next: captureInitialLoadSmall
+              - And:
+                - Variable: "$.Record.s3.object.size"
+                  NumericGreaterThan: 38400000
+                - Variable: "$.Record.s3.object.size"
+                  NumericLessThanEquals: 76800000
                 Next: captureInitialLoad
               - Variable: "$.Record.s3.object.size"
-                NumericGreaterThan: 38400000
+                NumericGreaterThan: 76800000
                 Next: captureInitialLoadMedium
+          captureInitialLoadExtraSmall:
+            Type: Task
+            Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-raw-load-${self:provider.stage}-iowCaptureExtraSmall
+            TimeoutSeconds: 120
+            Catch:
+              - ErrorEquals:
+                  - States.ALL
+                Next: errorHandler
+            Next: tsTypeRouterTask
           captureInitialLoadSmall:
             Type: Task
             Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-raw-load-${self:provider.stage}-iowCaptureSmall
