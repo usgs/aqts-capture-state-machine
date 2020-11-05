@@ -61,7 +61,7 @@ stepFunctions:
             Type: Choice
             Choices:
               - Variable: "$.Record.s3.object.size"
-                NumericLessThanEquals: 23500000
+                NumericLessThanEquals: 23500000 # empirically selected value on 2020-11-05
                 Next: captureInitialLoadExtraSmall
               - And:
                 - Variable: "$.Record.s3.object.size"
@@ -71,7 +71,7 @@ stepFunctions:
                 Next: captureInitialLoadSmall
               - And:
                 - Variable: "$.Record.s3.object.size"
-                  NumericGreaterThan: 50800000
+                  NumericGreaterThan: 50800000  # empirically selected value on 2020-11-05
                 - Variable: "$.Record.s3.object.size"
                   NumericLessThanEquals: 102400000
                 Next: captureInitialLoad
