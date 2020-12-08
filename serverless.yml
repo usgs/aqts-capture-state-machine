@@ -48,7 +48,6 @@ stepFunctions:
           alarm:
             Ref: snsTopic
         metrics:
-          - executionsFailed
           - executionThrottled
         treatMissingData: missing
       role: arn:aws:iam::#{AWS::AccountId}:role/step-functions-service-access
