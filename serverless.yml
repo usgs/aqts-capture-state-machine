@@ -161,7 +161,7 @@ stepFunctions:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsDescriptionResult
-            TimeoutSeconds: 75
+            TimeoutSeconds: 20
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -174,7 +174,7 @@ stepFunctions:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsCorrectedResult
-            TimeoutSeconds: 105
+            TimeoutSeconds: 20
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -187,7 +187,7 @@ stepFunctions:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsFieldVisitResult
-            TimeoutSeconds: 105
+            TimeoutSeconds: 20
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -200,7 +200,7 @@ stepFunctions:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsFieldVisitReadingsResult
-            TimeoutSeconds: 105
+            TimeoutSeconds: 20
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -214,7 +214,7 @@ stepFunctions:
               partitionNumber.$: $.partitionNumber
               type.$: $.tsTypeRouterResult.type
             ResultPath: $.fieldVisitTransformResult
-            TimeoutSeconds: 105
+            TimeoutSeconds: 20
             Catch:
               - ErrorEquals:
                   - States.ALL
@@ -227,7 +227,7 @@ stepFunctions:
               locationIdentifier.$: $.fieldVisitTransformResult.locationIdentifier
               monitoringLocationIdentifier.$: $.fieldVisitTransformResult.monitoringLocationIdentifier
             ResultPath: $.loadDiscreteGWResult
-            TimeoutSeconds: 75
+            TimeoutSeconds: 20
             End: true
             Catch:
               - ErrorEquals:
@@ -250,7 +250,7 @@ stepFunctions:
               partitionNumber.$: $.partitionNumber
               dataType.$: $.tsCorrectedResult.timeSeries.dataType
             ResultPath: $.dvstatTransformResult
-            TimeoutSeconds: 75
+            TimeoutSeconds: 20
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -262,7 +262,7 @@ stepFunctions:
               uniqueId.$: $.tsCorrectedResult.timeSeries.uniqueId
             Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-ts-loader-${self:provider.stage}-loadTimeSeries
             ResultPath: $.loadTimeSeriesResult
-            TimeoutSeconds: 75
+            TimeoutSeconds: 20
             End: true
             Catch:
               - ErrorEquals:
