@@ -214,7 +214,7 @@ stepFunctions:
               partitionNumber.$: $.partitionNumber
               type.$: $.tsTypeRouterResult.type
             ResultPath: $.fieldVisitTransformResult
-            TimeoutSeconds: 20
+            TimeoutSeconds: 100
             Catch:
               - ErrorEquals:
                   - States.ALL
@@ -227,7 +227,7 @@ stepFunctions:
               locationIdentifier.$: $.fieldVisitTransformResult.locationIdentifier
               monitoringLocationIdentifier.$: $.fieldVisitTransformResult.monitoringLocationIdentifier
             ResultPath: $.loadDiscreteGWResult
-            TimeoutSeconds: 20
+            TimeoutSeconds: 70
             End: true
             Catch:
               - ErrorEquals:
@@ -250,7 +250,7 @@ stepFunctions:
               partitionNumber.$: $.partitionNumber
               dataType.$: $.tsCorrectedResult.timeSeries.dataType
             ResultPath: $.dvstatTransformResult
-            TimeoutSeconds: 20
+            TimeoutSeconds: 70
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -262,7 +262,7 @@ stepFunctions:
               uniqueId.$: $.tsCorrectedResult.timeSeries.uniqueId
             Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-ts-loader-${self:provider.stage}-loadTimeSeries
             ResultPath: $.loadTimeSeriesResult
-            TimeoutSeconds: 20
+            TimeoutSeconds: 70
             End: true
             Catch:
               - ErrorEquals:
