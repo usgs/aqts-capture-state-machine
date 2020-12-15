@@ -120,7 +120,7 @@ stepFunctions:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsTypeRouterResult
-            TimeoutSeconds: 75
+            TimeoutSeconds: 20
             Catch:
               - ErrorEquals:
                 - States.ALL
