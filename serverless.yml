@@ -120,7 +120,7 @@ stepFunctions:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsTypeRouterResult
-            TimeoutSeconds: 20
+            TimeoutSeconds: 70
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -161,7 +161,7 @@ stepFunctions:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsDescriptionResult
-            TimeoutSeconds: 20
+            TimeoutSeconds: 70
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -174,7 +174,7 @@ stepFunctions:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsCorrectedResult
-            TimeoutSeconds: 20
+            TimeoutSeconds: 100
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -187,7 +187,7 @@ stepFunctions:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsFieldVisitResult
-            TimeoutSeconds: 20
+            TimeoutSeconds: 100
             Catch:
               - ErrorEquals:
                 - States.ALL
@@ -200,7 +200,7 @@ stepFunctions:
               id.$: $.id
               partitionNumber.$: $.partitionNumber
             ResultPath: $.tsFieldVisitReadingsResult
-            TimeoutSeconds: 20
+            TimeoutSeconds: 100
             Catch:
               - ErrorEquals:
                 - States.ALL
