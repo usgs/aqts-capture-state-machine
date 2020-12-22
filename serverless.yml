@@ -274,6 +274,7 @@ stepFunctions:
             Parameters:
               "executionArn.$": "$$.Execution.Id"
               "startInput.$": "$$.Execution.Input"
+              "cause.$": $.Cause
             Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-error-handler-${self:provider.stage}-aqtsErrorHandler
             TimeoutSeconds: 60
             Next: defaultFail
