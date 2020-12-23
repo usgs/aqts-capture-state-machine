@@ -21,6 +21,7 @@ provider:
     "displayName": "State Machine"
 
 custom:
+  mailingList: ${ssm:/aws/reference/secretsmanager/AQTS-CAPTURE-MAILING-LISTS~true}
   tier:
     DEV:
       parsed: DEV
@@ -290,6 +291,10 @@ resources:
       Properties:
         DisplayName: ${self:service}-${self:provider.stage}-topic
         TopicName: ${self:service}-${self:provider.stage}-topic
+        Subscription:
+          - Protocol: email
+          Endpoint: ${self:custom.mailingList.CAPTURE_WARNINGS_LIST}
+
     stateDurationAlarm:
       Type: AWS::CloudWatch::Alarm
       Properties:
