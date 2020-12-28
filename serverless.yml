@@ -292,6 +292,7 @@ stepFunctions:
             Parameters:
               QueueUrl:
                 Ref: almostDeadLetterQueue
+              MessageBody.$: $$.Execution.Input
             Next: defaultFail
           defaultSuccess:
             Type: Succeed
