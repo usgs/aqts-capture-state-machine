@@ -281,6 +281,17 @@ stepFunctions:
               "cause.$": $.Cause
             Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-error-handler-${self:provider.stage}-aqtsErrorHandler
             TimeoutSeconds: 60
+            Catch:
+              - ErrorEquals:
+                - States.ALL
+                Next: sendToSqs
+            Next: defaultFail
+          sendToSqs:
+            Type: Task
+            Resource: arn:aws:states:::sqs:sendMessage
+            Parameters:
+              QueueUrl:
+                Ref: almostDeadLetterQueue
             Next: defaultFail
           defaultSuccess:
             Type: Succeed
@@ -316,6 +327,11 @@ resources:
         TreatMissingData: missing
         AlarmActions:
           - Ref: snsTopic
+    almostDeadLetterQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:service}-near-death-queue-${self:provider.stage}
+        MessageRetentionPeriod: 345600
     iamRole:
       Type: AWS::IAM::Role
       Properties:
@@ -337,6 +353,17 @@ resources:
                   Action:
                     - states:StartExecution
                   Resource: "*"
+          - PolicyName: sendtosqs
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - sqs:SendMessage
+                  Resource:
+                    Fn::GetAtt:
+                      - almostDeadLetterQueue
+                      - Arn
         RoleName: ${self:service}-${self:provider.stage}-role
         ManagedPolicyArns:
           - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
