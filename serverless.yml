@@ -52,7 +52,10 @@ stepFunctions:
         metrics:
           - executionThrottled
         treatMissingData: missing
-      role: arn:aws:iam::#{AWS::AccountId}:role/step-functions-service-access
+      role:
+        Fn::GetAtt:
+          - iamRole
+          - Arn
       name: aqts-capture-state-machine-${self:provider.stage}
       definition:
         Comment: "State machine representing extract, transformation, and load from Aquarius"
@@ -294,7 +297,6 @@ resources:
         Subscription:
           - Protocol: email
             Endpoint: ${self:custom.mailingList.CAPTURE_WARNINGS_LIST}
-
     stateDurationAlarm:
       Type: AWS::CloudWatch::Alarm
       Properties:
@@ -314,6 +316,36 @@ resources:
         TreatMissingData: missing
         AlarmActions:
           - Ref: snsTopic
+    iamRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - states.amazonaws.com
+                  - events.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: startexecution
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - states:StartExecution
+                  Resource: "*"
+        RoleName: aqts-capture-step-function-${self:provider.stage}
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+          - arn:aws:iam::aws:policy/CloudWatchFullAccess
+        PermissionsBoundary:
+          Fn::Sub:
+            - "arn:aws:iam::${accountId}:policy/csr-Developer-Permissions-Boundary"
+            - accountId:
+               Ref: "AWS::AccountId"
 
 plugins:
   - serverless-step-functions
