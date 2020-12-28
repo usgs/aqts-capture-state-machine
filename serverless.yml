@@ -337,7 +337,7 @@ resources:
                   Action:
                     - states:StartExecution
                   Resource: "*"
-        RoleName: aqts-capture-step-function-${self:provider.stage}
+        RoleName: ${self:service}-${self:provider.stage}-role
         ManagedPolicyArns:
           - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
           - arn:aws:iam::aws:policy/CloudWatchFullAccess
