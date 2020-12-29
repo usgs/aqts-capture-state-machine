@@ -281,6 +281,23 @@ stepFunctions:
               "cause.$": $.Cause
             Resource: arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:aqts-capture-error-handler-${self:provider.stage}-aqtsErrorHandler
             TimeoutSeconds: 60
+            Catch:
+              - ErrorEquals:
+                - Lambda.Unknown
+                - Lambda.TooManyRequestsException
+                Next: sqsFailSafe
+            Next: defaultFail
+          sqsFailSafe:
+            Type: Task
+            Resource: arn:aws:states:::sqs:sendMessage
+            Parameters:
+              QueueUrl:
+                Fn::Sub:
+                  - https://sqs.${self:provider.region}.amazonaws.com/${accountId}/aqts-capture-error-queue-${self:provider.stage}
+                  - accountId:
+                      Ref: "AWS::AccountId"
+              MessageBody.$: $$.ExecutionInput
+              DelaySeconds: 180
             Next: defaultFail
           defaultSuccess:
             Type: Succeed
@@ -337,6 +354,18 @@ resources:
                   Action:
                     - states:StartExecution
                   Resource: "*"
+          - PolicyName: sendtosqs
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - sqs:SendMessage
+                  Resource:
+                    Fn::Sub:
+                      - arn:aws:sqs:${self:provider.region}:${accountId}:aqts-capture-error-queue-${self:provider.stage}
+                      - accountId:
+                          Ref: "AWS::AccountId"
         RoleName: ${self:service}-${self:provider.stage}-role
         ManagedPolicyArns:
           - arn:aws:iam::aws:policy/service-role/AWSLambdaRole

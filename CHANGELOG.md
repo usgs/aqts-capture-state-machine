@@ -8,3 +8,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Create IAM with the state machine
 - New repository
+- Add support for SQS failsafe queue if errorHandler state fails
