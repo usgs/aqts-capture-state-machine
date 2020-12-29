@@ -283,7 +283,8 @@ stepFunctions:
             TimeoutSeconds: 60
             Catch:
               - ErrorEquals:
-                - States.ALL
+                - Lambda.Unknown
+                - Lambda.TooManyRequestsException
                 Next: sqsFailSafe
             Next: defaultFail
           sqsFailSafe:
@@ -296,6 +297,7 @@ stepFunctions:
                   - accountId:
                       Ref: "AWS::AccountId"
               MessageBody.$: $$.ExecutionInput
+              DelaySeconds: 180
             Next: defaultFail
           defaultSuccess:
             Type: Succeed
