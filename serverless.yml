@@ -296,7 +296,7 @@ stepFunctions:
                   - https://sqs.${self:provider.region}.amazonaws.com/${accountId}/aqts-capture-error-queue-${self:provider.stage}
                   - accountId:
                       Ref: "AWS::AccountId"
-              MessageBody.$: $$.ExecutionInput
+              MessageBody.$: "$$.Execution.Input"
               DelaySeconds: 180
             Next: defaultFail
           defaultSuccess:
