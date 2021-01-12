@@ -169,18 +169,6 @@ stepFunctions:
               - Variable: "$.tsTypeRouterResult.type"
                 StringEquals: tsCorrectedData
                 Next: tsCorrectedData
-              - And:
-                - Variable: "$.tsTypeRouterResult.type"
-                  StringEquals: fieldVisitData
-                - Variable: "$$.StateMachine.Name"
-                  StringEquals: "aqts-capture-state-machine-PROD-EXTERNAL"
-                Next: defaultSuccess
-              - And:
-                - Variable: "$.tsTypeRouterResult.type"
-                  StringEquals: fieldVisitReadings
-                - Variable: "$$.StateMachine.Name"
-                  StringEquals: "aqts-capture-state-machine-PROD-EXTERNAL"
-                Next: defaultSuccess
               - Variable: "$.tsTypeRouterResult.type"
                 StringEquals: fieldVisitData
                 Next: tsFieldVisit
