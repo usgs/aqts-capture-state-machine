@@ -80,11 +80,11 @@ stepFunctions:
                 - Variable: "$.Record.s3.object.size"
                   NumericGreaterThan: 23500000
                 - Variable: "$.Record.s3.object.size"
-                  NumericLessThanEquals: 50800000
+                  NumericLessThanEquals: 45000000
                 Next: captureInitialLoadSmall
               - And:
                 - Variable: "$.Record.s3.object.size"
-                  NumericGreaterThan: 50800000  # empirically selected value on 2020-11-05
+                  NumericGreaterThan: 45000000  # empirically selected value on 2021-01-20
                 - Variable: "$.Record.s3.object.size"
                   NumericLessThanEquals: 102400000
                 Next: captureInitialLoad
