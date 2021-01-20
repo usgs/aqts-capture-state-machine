@@ -386,6 +386,37 @@ resources:
         TreatMissingData: missing
         AlarmActions:
           - Ref: snsTopic
+    failurePercentAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmName: ${self:service}-${self:provider.stage}-failure-alarm
+        AlarmDescription: Alarm when the state machine is failing at a certain percentage
+        Dimensions:
+          - Name: StateMachineArn
+            Value:
+              Ref: AqtsDashcaptureDashstateDashmachineDash${self:custom.tier.${self:provider.stage}.parsed}
+        Metrics:
+          - Expression: m1/m2 * 100
+            Id: failurePercent
+            ReturnData: True
+          - Id: m1
+            MetricStat:
+              Metric:
+                MetricName: ExecutionsFailed
+                Namespace: AWS/States
+            Period: 60
+            Stat: Sum
+          - Id: m2
+            MetricStat:
+              Metric:
+                MetricName: ExecutionsStarted
+                Namespace: AWS/States
+            Period: 60
+            Stat: Sum
+          TreatMissingData: missing
+          ThresholdMetricId: failurePercent
+          Threshold: 80
+          EvaluationPeriods: 5
     iamRole:
       Type: AWS::IAM::Role
       Properties:
