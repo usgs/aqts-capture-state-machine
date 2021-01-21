@@ -256,7 +256,7 @@ stepFunctions:
               partitionNumber.$: $.partitionNumber
               type.$: $.tsTypeRouterResult.type
             ResultPath: $.fieldVisitTransformResult
-            TimeoutSeconds: 100
+            TimeoutSeconds: 280
             Catch:
               - ErrorEquals:
                   - States.ALL
