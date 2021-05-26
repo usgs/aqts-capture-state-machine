@@ -2,7 +2,7 @@
   "name": "aqarius-ts-capture-state-machine",
   "description": "Deployment via serverless",
   "dependencies": {
-    "serverless": "2.16.1",
+    "serverless": "2.43.1",
     "serverless-step-functions": "^2.21.1",
     "serverless-plugin-git-variables": "^5.1.0"
   }
